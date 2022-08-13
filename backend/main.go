@@ -19,7 +19,7 @@ func main(){
 	router.Use(cors.Default())
 
 	router.POST("/entry/create", routes.AddEntry)
-	router.GET("/entries", routes.GetEntry)
+	router.GET("/entries", routes.GetEntries)
 	router.GET("/entry/:id", routes.GetEntryById)
 	router.GET("/ingredients/:ingrediet", routes.GetEntriesByIngredient)
 
