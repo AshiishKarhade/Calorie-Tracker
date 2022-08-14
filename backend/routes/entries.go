@@ -43,7 +43,20 @@ func GetEntries(c *gin.Context){
 }
 
 func GetEntryById(c *gin.Context){
+	entryID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(entryID)
 
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	var entry bson.M
+	err := entryCollection.FindOne(ctx, bson.M{"_id": docID}).Decode(&entry)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	fmt.Println(entry)
+	c.JSON(http.StatusOK, entry)
+	defer cancel()
 }
 
 func GetEntriesByIngredient(c *gin.Context){
@@ -59,7 +72,7 @@ func UpdateIngredient(c *gin.Context){
 }
 
 func DeleteEntry(c *gin.Context){
-	entryID := c.Param("id")
+	entryID := c.Params.ByName("id")
 	docID, _ := primitive.ObjectIDFromHex(entryID)
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
