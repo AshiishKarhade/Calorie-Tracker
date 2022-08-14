@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Axios from 'axios';
+import axios from 'axios';
+
 import {
     Button,
     Form,
@@ -41,7 +42,7 @@ const Entries = () => {
                 ))}
             </Container>
 
-            <Modal show={addNewEntry} onHide={()=>setAddNewEntry(false)} centered={}>
+            <Modal show={addNewEntry} onHide={()=>setAddNewEntry(false)} centered>
                 <ModalHeader closeButton>
                     <ModalTitle>Add Calorie Entry</ModalTitle>
                 </ModalHeader>
@@ -67,8 +68,46 @@ const Entries = () => {
                 </ModalBody>
             </Modal>
 
+            <Modal show={changeEntry.change} onHide={()=> setChangeEntry({"change":false, "id":0})} centered>
+                <ModalHeader closeButton>
+                    <ModalTitle>Update Calorie Entry</ModalTitle>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <FormLabel>dish</FormLabel>
+                        <FormControl onChange={(event)=>{newEntry.dish = event.target.value }}></FormControl>
+
+                        <FormLabel>ingredients</FormLabel>
+                        <FormControl onChange={(event)=>{newEntry.ingredients = event.target.value }}></FormControl>
+
+                        <FormLabel>calories</FormLabel>
+                        <FormControl onChange={(event)=>{newEntry.calories = event.target.value }}></FormControl>
+
+                        <FormLabel>protein</FormLabel>
+                        <FormControl onChange={(event)=>{newEntry.protein = event.target.value }}></FormControl>
+
+                        <FormLabel>fats</FormLabel>
+                        <FormControl type="number" onChange={(event)=>{newEntry.fats = event.target.value }}></FormControl>
+                    </FormGroup>
+                    <Button onClick={()=> changeSingleEntry()}>Add</Button>
+                    <Button onClick={()=> setChangeEntry({"change":false, "id":0})}>Cancel</Button>
+                </ModalBody>
+            </Modal>
+
         </div>
     );
+
+    function changeSingleEntry(){
+        changeEntry.change(false);
+        var url = "http://localhost:8001/entry/update" + changeEntry.id
+        axios.put(url, {
+            newEntry
+        }).then(response => {
+            if(response.status === 200){
+                setRefreshData(true)
+            }
+        });
+    }
 
     function getAllEntries(){
         var url = "http://localhost:8001/entries"
@@ -82,20 +121,19 @@ const Entries = () => {
     }
 
     function addSingleEntry(){
-        setAddNewEntry(false){
-            var url = "http://localhost:8001/entry/create"
-            axios.post(url, {
-                "ingredients": newEntry.ingredients,
-                "dish": newEntry.dish,
-                "calories": newEntry.calories,
-                "protein": newEntry.protein,
-                "fats": parseFloat(newEntry.fats)
-            }).then(response=> {
-                if(response.status === 200){
-                    setRefreshData(true)
-                }
-            })
-        }
+        setAddNewEntry(false)
+        var url = "http://localhost:8001/entry/create"
+        axios.post(url, {
+            "ingredients": newEntry.ingredients,
+            "dish": newEntry.dish,
+            "calories": newEntry.calories,
+            "protein": newEntry.protein,
+            "fats": parseFloat(newEntry.fats)
+        }).then(response=> {
+            if(response.status === 200){
+                setRefreshData(true)
+            }
+        })
     }
 
     function deleteSingleEntry(id){
@@ -109,6 +147,8 @@ const Entries = () => {
         })
     }
 }
+
+export default Entries
 
 
 
